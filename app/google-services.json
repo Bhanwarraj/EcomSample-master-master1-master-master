@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "1099185445947",
+    "firebase_url": "https://ecommercenotify.firebaseio.com",
+    "project_id": "ecommercenotify",
+    "storage_bucket": "ecommercenotify.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1099185445947:android:26d85707d3555ca0",
+        "android_client_info": {
+          "package_name": "com.allandroidprojects.ecomsample"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1099185445947-3h9b0j3hndqf7vu0stqms92j86777vcq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.allandroidprojects.ecomsample",
+            "certificate_hash": "cb6a309b1451364d3c502a2842541472ce869b42"
+          }
+        },
+        {
+          "client_id": "1099185445947-96i664jf7pnavqaqmu1aje5hbffgknns.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.allandroidprojects.ecomsample",
+            "certificate_hash": "f5c9a083c32e4a98e1264270d62f99210ead77e7"
+          }
+        },
+        {
+          "client_id": "1099185445947-pv8tcuqvd0msof2kn0hj8i2fb0b6081m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnoCbVeR7EJuxeCApMdy-V31MtLzzPRbA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1099185445947-pv8tcuqvd0msof2kn0hj8i2fb0b6081m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
