@@ -137,21 +137,23 @@ public class MainActivity extends AppCompatActivity
                         Log.d("MainActivity", msg);
                         Log.d("", "opened");
                         Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
+                        Log.d("Context","Checking"+getApplicationContext()+""+getBaseContext()+this +""+context);
+                        TimeZone tz=TimeZone.getTimeZone("GMT+5:30");
+                        Calendar c=Calendar.getInstance(tz);
+                        String time=String.format("%02d",c.get(Calendar.HOUR_OF_DAY))+":"+String.format("%02d",c.get(Calendar.MINUTE));
+                        ////////////By mistake app opened code pending///////////
+                      //  default_open();
 
                     }
                 });
-        TimeZone tz=TimeZone.getTimeZone("GMT+5:30");
-        Calendar c=Calendar.getInstance(tz);
-        String time=String.format("%02d",c.get(Calendar.HOUR_OF_DAY))+":"+String.format("%02d",c.get(Calendar.MINUTE));
-        ////////////By mistake app opened code pending///////////
-        default_open();
+
        // readFiletokenid("token_id.csv",token,personemailfortoken,MainActivity.this);
         //writeTotoken_id(token,"token_id.csv",personemailfortoken,MainActivity.this);
     }
 
-    private void default_open() {
+    private void default_open(Context context) {
         Default_Notification obj = new Default_Notification();
-        obj.activeHour("Yes", MainActivity.this);
+        obj.activeHour("Yes",context);
         Log.d("Default_noti","Not started");
     }
 
