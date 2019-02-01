@@ -143,6 +143,7 @@ public class MainActivity extends AppCompatActivity
                         String time=String.format("%02d",c.get(Calendar.HOUR_OF_DAY))+":"+String.format("%02d",c.get(Calendar.MINUTE));
                         ////////////By mistake app opened code pending///////////
                       //  default_open();
+                        //
 
                     }
                 });
