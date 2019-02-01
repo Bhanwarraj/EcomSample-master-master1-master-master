@@ -64,8 +64,8 @@ public class NotificationHandler extends com.google.firebase.messaging.FirebaseM
 
         Intent intentaction=new Intent(this,ActionReceiver.class);
         Log.d("Intentaction","done");
-        intentaction.setAction("Yes");
-        intentaction.setAction("No");
+        intentaction.setAction("Interested");
+        intentaction.setAction("Not Interested");
         //intentaction.putExtra("Yes","Yes");
         //intentaction.putExtra("No","No");
 
@@ -77,8 +77,8 @@ public class NotificationHandler extends com.google.firebase.messaging.FirebaseM
                         .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
                         .setContentTitle(title)
                         .setContentText(messageBody)
-                        .addAction(R.mipmap.tick,"YES",pIntent)
-                        .addAction(R.drawable.ic_clear_black_18dp,"NO",pIntent)
+                        .addAction(R.mipmap.tick,"Interested",pIntent)
+                        .addAction(R.drawable.ic_clear_black_18dp,"Not Interested",pIntent)
                         .setAutoCancel(true)
                         .setSound(defaultSoundUri)
                         .setContentIntent(pIntent);

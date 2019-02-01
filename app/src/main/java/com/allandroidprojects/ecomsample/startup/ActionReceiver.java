@@ -17,7 +17,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-
+//import  com.allandroidprojects.ecomsample.startup.MainActivity;
+import com.allandroidprojects.ecomsample.Default_Notification;
 import com.allandroidprojects.ecomsample.startup.NotificationHandler;
 import com.allandroidprojects.ecomsample.utility.SaveInformation;
 
@@ -33,35 +34,36 @@ public class ActionReceiver extends BroadcastReceiver {
     private boolean permissionGranted;
     static String personemail1;
 
+
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d("Received1", "ReceiverYes1");
         String action = intent.getAction();
-        if ("Yes".equals(action)) {
+        if ("Interested".equals(action)) {
             str = "Yes";
+            TimeZone tz=TimeZone.getTimeZone("GMT+5:30");
+            Calendar c=Calendar.getInstance(tz);
+            String time=String.format("%02d",c.get(Calendar.HOUR_OF_DAY))+":"+String.format("%02d",c.get(Calendar.MINUTE));
+            active_hour();
             Log.d("Received", "ReceiverYes");
             MainActivity i= new MainActivity();
             try {
-                 Calendar cal=Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                SimpleDateFormat simpleDateFormat=new SimpleDateFormat("EE MMM dd HH:mm:ss zzz yyy", Locale.US);
-                simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                  Long time= cal.getTimeInMillis();
-                i.writeToAnyFile(str,title1,message1,personname1,"info.csv",personemail1,time, context);
+
+                i.writeToAnyFile(str,title1,message1,personname1,"noti_action.csv",personemail1,time, context);
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
 
-        } else if ("No".equals(action)) {
+        } else if ("Not Interested".equals(action)) {
             Log.d("NO","run");
            String str1 = "No";
             MainActivity i= new MainActivity();
             try {
-                Calendar cal=Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                SimpleDateFormat simpleDateFormat=new SimpleDateFormat("EE MMM dd HH:mm:ss zzz yyy", Locale.US);
-                simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                 Long time1= cal.getTimeInMillis();
-                i.writeToAnyFile(str1,title1,message1,personname1,"info.csv",personemail1,time1, context);
+                TimeZone tz=TimeZone.getTimeZone("GMT+5:30");
+                Calendar c=Calendar.getInstance(tz);
+                String time1=String.format("%02d",c.get(Calendar.HOUR_OF_DAY))+":"+String.format("%02d",c.get(Calendar.MINUTE));
+                i.writeToAnyFile(str1,title1,message1,personname1,"noti_action.csv",personemail1,time1, context);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -69,6 +71,12 @@ public class ActionReceiver extends BroadcastReceiver {
         }
         Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
         context.sendBroadcast(it);
+    }
+
+    private void active_hour() {
+
+        MainActivity s=new MainActivity();
+        s.openactivehour();
     }
 
     public void getnotifyinfo(String title, String message) {

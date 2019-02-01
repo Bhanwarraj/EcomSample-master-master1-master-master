@@ -10,16 +10,22 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 
+import com.allandroidprojects.ecomsample.Default_Notification;
 import com.allandroidprojects.ecomsample.R;
+
+import java.util.Calendar;
+import java.util.TimeZone;
 
 public class SplashActivity extends Activity implements Animation.AnimationListener {
     Animation animFadeIn;
     LinearLayout linearLayout;
+    String app;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
 
         if (Build.VERSION.SDK_INT < 16) {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -54,6 +60,7 @@ public class SplashActivity extends Activity implements Animation.AnimationListe
 
     @Override
     public void onAnimationStart(Animation animation) {
+
         //under Implementation
     }
 
@@ -62,6 +69,7 @@ public class SplashActivity extends Activity implements Animation.AnimationListe
             Intent i = new Intent(SplashActivity.this, WelcomeActivity.class);
             startActivity(i);
             this.finish();
+
     }
 
     @Override

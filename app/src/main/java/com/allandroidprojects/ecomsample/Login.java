@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.allandroidprojects.ecomsample.options.SearchResultActivity;
 import com.allandroidprojects.ecomsample.startup.ActionReceiver;
 import com.allandroidprojects.ecomsample.startup.MainActivity;
 import com.allandroidprojects.ecomsample.utility.SaveInformation;
@@ -25,6 +26,7 @@ import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleBrowserClientRequestUrl;
@@ -45,10 +47,14 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -67,13 +73,13 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     private static final int RC_SIGN_IN = 9001;
     private GoogleSignInClient mGoogleSignInClient;
     public DatabaseReference mDatabase;
-    public static final String SHARED_PREFS="sharedpref";
-    public static final String PersonNm="text";
-    public static final String Personelmid="text";
+    public static final String SHARED_PREFS = "sharedpref";
+    public static final String PersonNm = "text";
+    public static final String Personelmid = "text";
 
     private String getPersonNm;
     private String getPersonelmid;
-    private Context context;
+    public Context context;
 
     /*
     private String name, email;
@@ -88,7 +94,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        Log.d("Entered", "Login");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // button = (SignInButton) findViewById(R.id.Glogin);
@@ -214,10 +220,11 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             try {
 
                 //  Toast.makeText(Login.this, "Toast1", Toast.LENGTH_SHORT).show();
-
+                Log.d("hello", "Hiii");
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 Toast.makeText(Login.this, "Toast2", Toast.LENGTH_SHORT).show();
+                assert account != null;
                 firebaseAuthWithGoogle(account);
                 //  Toast.makeText(Login.this, "Sign", Toast.LENGTH_SHORT).show();
             } catch (ApiException e) {
@@ -252,7 +259,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                                 e.printStackTrace();
                             }
                         } else {
-                            // If sign in fails, display a message to the user.
+                            // If sign in fails, display a message to cthe user.
                             //Log.w(TAG, "signInWithCredential:failure", task.getException());
                             //Snackbar.make(findViewById(R.id.main_layout), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
                             Toast.makeText(Login.this, "Auth failed.", Toast.LENGTH_SHORT).show();
@@ -290,40 +297,45 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString(PersonNm, personName);
             editor.putString(Personelmid, personId);
-
-           SaveInformation saveInformation=new SaveInformation(personName,personEmail,personFamilyName,personId,Login.this);
+            MainActivity i=new MainActivity();
+            i.writeTousertxt("users.txt", personEmail,Login.this);
+            Log.d("writed", "txt");
+            SaveInformation saveInformation = new SaveInformation(personName, personEmail, personFamilyName, personId, Login.this);
 
             mDatabase.child(personId).setValue(saveInformation);
             ActionReceiver obj = new ActionReceiver();
-            obj.getuserinfo(personId, personName,personEmail);
+            obj.getuserinfo(personId, personName, personEmail);
             Log.d("csv", "csvmsg");
-
+            Default_Notification dn=new Default_Notification();
+            dn.personinfo(personEmail);
 
 
         }
     }
 
-    public void alreadylogin(Context c, FirebaseUser user)
-    {
-      String personname= user.getDisplayName();
-      String personId=user.getUid();
-      String personemail=user.getEmail();
+    public String alreadylogin(Context c, FirebaseUser user) throws IOException {
+        String personname = user.getDisplayName();
+        String personId = user.getUid();
+        String personemail = user.getEmail();
+        //writeTousertxt("users.csv",personemail,c);
         ActionReceiver obj = new ActionReceiver();
-        obj.getuserinfo(personId, personname,personemail);
-        Log.d("csv", "csvmsg1");
-
-
+        obj.getuserinfo(personId, personname, personemail);
+        SearchResultActivity obj2 = new SearchResultActivity();
+        obj2.getuserinfo_search(personemail);
+        Default_Notification dn=new Default_Notification();
+        dn.personinfo(personemail);
+        Log.d("csv", "csvmsg90");
+        return personemail;
     }
 
 
-
-        @Override
-        public void onClick (View v){
-            int i = v.getId();
-            if (i == R.id.Glogin) {
-                signIn();
-            }
+    @Override
+    public void onClick(View v) {
+        int i = v.getId();
+        if (i == R.id.Glogin) {
+            signIn();
         }
+    }
 
 
     public void setUp() throws IOException {
@@ -384,7 +396,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
         Person createdContact = peopleService.people().createContact(contactToCreate).execute();
     }
-    }
+
+
+
+}
 
 
 
