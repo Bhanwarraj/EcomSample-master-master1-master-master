@@ -34,10 +34,10 @@ public class Default_Notification extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_default__notification);
-        activeHour("No",this);
+        activeHour("No");
 
     }
-    public void activeHour(String check,Context ct)
+    public void activeHour(String check)
     {TimeZone tz = TimeZone.getTimeZone("GMT+5:30");
         Calendar c = Calendar.getInstance(tz);
         int time = Integer.parseInt(String.format("%02d", c.get(Calendar.HOUR_OF_DAY)));
@@ -79,7 +79,7 @@ public class Default_Notification extends AppCompatActivity {
                 writer.flush();
                 writer.close();
             } catch (Exception e) {
-                File dir = ct.getFilesDir();
+                File dir = getFilesDir();
                 File file = new File(dir,"active_hours.csv");
                 FileWriter output = null;
                 try {

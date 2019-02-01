@@ -306,7 +306,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             ActionReceiver obj = new ActionReceiver();
             obj.getuserinfo(personId, personName, personEmail);
             Log.d("csv", "csvmsg");
-            Default_Notification dn=new Default_Notification();
+            MainActivity dn=new MainActivity();
             dn.personinfo(personEmail);
 
 
