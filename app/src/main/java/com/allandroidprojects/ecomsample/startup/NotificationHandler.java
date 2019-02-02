@@ -25,7 +25,7 @@ public class NotificationHandler extends com.google.firebase.messaging.FirebaseM
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        String title = remoteMessage.getNotification().getTitle();
+        String title = Objects.requireNonNull(remoteMessage.getNotification()).getTitle();
         String message = remoteMessage.getNotification().getBody();
         Log.d("Notification","Notification Received: \n"
                 +"Title:"+title
@@ -39,6 +39,7 @@ public class NotificationHandler extends com.google.firebase.messaging.FirebaseM
 
     @Override
     public void onDeletedMessages() {
+
 
     }
 
@@ -64,21 +65,23 @@ public class NotificationHandler extends com.google.firebase.messaging.FirebaseM
 
         Intent intentaction=new Intent(this,ActionReceiver.class);
         Log.d("Intentaction","done");
-        intentaction.setAction("Interested");
-        intentaction.setAction("Not Interested");
+        intentaction.setAction("Useful");
+        Intent intentaction1=new Intent(this,ActionReceiver.class);
+        intentaction1.setAction("Not Useful");
         //intentaction.putExtra("Yes","Yes");
         //intentaction.putExtra("No","No");
 
         String channelId = ""; // we need to get channel id here = getString(R.string.default_notification_channel_id);
        PendingIntent pIntent=PendingIntent.getBroadcast(this,1,intentaction,PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pIntent1=PendingIntent.getBroadcast(this,1,intentaction1,PendingIntent.FLAG_UPDATE_CURRENT);
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
                         .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
                         .setContentTitle(title)
                         .setContentText(messageBody)
-                        .addAction(R.mipmap.tick,"Interested",pIntent)
-                        .addAction(R.drawable.ic_clear_black_18dp,"Not Interested",pIntent)
+                        .addAction(R.mipmap.tick,"Useful",pIntent)
+                        .addAction(R.drawable.ic_clear_black_18dp,"Not Useful",pIntent1)
                         .setAutoCancel(true)
                         .setSound(defaultSoundUri)
                         .setContentIntent(pIntent);

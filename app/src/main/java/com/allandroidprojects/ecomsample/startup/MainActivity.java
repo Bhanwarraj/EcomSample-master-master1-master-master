@@ -1,6 +1,7 @@
 package com.allandroidprojects.ecomsample.startup;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -55,8 +56,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.TimeZone;
@@ -88,6 +91,10 @@ public class MainActivity extends AppCompatActivity
         FirebaseStorage storage = FirebaseStorage.getInstance();
          File dir=getFilesDir();
 
+
+         Log.d("DIRECTORY","comeon:::"+dir);
+
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -116,14 +123,13 @@ public class MainActivity extends AppCompatActivity
         });*/
         Log.d("enteringlogin", "main1");
 
-       final   FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        final FirebaseUser user = mAuth.getCurrentUser();
-        if (user == null) {
+        final   FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        if (mAuth.getCurrentUser() == null) {
             Log.d("Entered", "Logingoing");
             Intent intent = new Intent(this, Login.class);
             startActivity(intent);
-            try {
-                writeTousertxt("user.txt",personemail_txt,dir,this);
+           try { Log.d("LOG","::");
+                writeTousertxt("users.txt",personemail_txt,dir,this);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -155,6 +161,7 @@ public class MainActivity extends AppCompatActivity
                         Log.d("", "opened");
                         Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
                         Log.d("Context", "Checking" + getApplicationContext() + "" + getBaseContext() + this + "" + context);
+                        token();
                         TimeZone tz = TimeZone.getTimeZone("GMT+5:30");
                         Calendar c = Calendar.getInstance(tz);
                         String time = String.format("%02d", c.get(Calendar.HOUR_OF_DAY)) + ":" + String.format("%02d", c.get(Calendar.MINUTE));
@@ -167,13 +174,27 @@ public class MainActivity extends AppCompatActivity
 
         //  Default_Notification obj = new Default_Notification();
         //obj.activeHour("Yes");
-        // readFiletokenid("token_id.csv",token,personemailfortoken,MainActivity.this);
-        //writeTotoken_id(token,"token_id.csv",personemailfortoken,MainActivity.this);
+
+        try{
+            token();
+        }catch (Exception e)
+        {
+            Log.d("TOKEN","NOT OPEN");
+        }
         try {
             activeHour("Yes");
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+
+
+    private void token() {
+
+        readFiletokenid("token_id.csv",token,personemailfortoken,MainActivity.this);
+        writeTotoken_id(token,"token_id.csv",personemailfortoken,MainActivity.this);
+
     }
 
    /* private void default_open(Context context) {
@@ -342,15 +363,14 @@ public class MainActivity extends AppCompatActivity
     //////////////////////NOTIFICATION_ACTION_INFORMATION//////////////////////////////////
 
     public void writeToAnyFile(String str, String title, String message, String personname, String localFileName, String personemail, String time, Context context) throws IOException {
-        Log.d("Received", "ReceiverYes10");
-
-
+        Log.d("Received", "Notification");
+       // File dir=getFilesDir();
         //  localFileName is with the file with extension which needs the content to be written on it.
-        File file = new File(context.getFilesDir(), localFileName);
-        Log.d("Context00", "msg" + context.getFilesDir());
+        File file = new File(context.getApplicationInfo().dataDir, localFileName);
+        Log.d("Context00", "msg" +context.getApplicationInfo().dataDir);
 
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file, true));
-        if (!file.exists() && !file.isDirectory()) {
+      /*  if (!file.exists() && !file.isDirectory()) {
             bufferedWriter.write("Message");
             bufferedWriter.write(",");
             bufferedWriter.write("Category");
@@ -359,7 +379,7 @@ public class MainActivity extends AppCompatActivity
             bufferedWriter.write(",");
             bufferedWriter.write("Action");
             bufferedWriter.write("\n");
-        }
+        }*/
         bufferedWriter.write(message);
         bufferedWriter.write(",");
         bufferedWriter.write(title);
@@ -371,14 +391,14 @@ public class MainActivity extends AppCompatActivity
 
         bufferedWriter.close();
         Log.d("Received", "ReceiverYes9");
-        readFromAnyFile(localFileName, context);
+        //readFromAnyFile(localFileName, context);
         uploadAnyFile("users", personemail, localFileName, context);
 
     }
 
     public void readFromAnyFile(String sourceFileNameWExt, Context context) {
         File dir = context.getFilesDir();
-        File file = new File(dir, sourceFileNameWExt);
+        File file = new File(getFilesDir(), sourceFileNameWExt);
         Log.d("Context", "msg" + dir);
         String readData = "";
         //File f = new File()
@@ -404,8 +424,9 @@ public class MainActivity extends AppCompatActivity
 
     public void uploadAnyFile(String firebaseFolder, String personemail, String sourceFileName, Context context1) {
         Log.d("Uploading", "Storagebucket");
-        File dir = context1.getFilesDir();
-        File file = new File(dir, sourceFileName);
+        //File dir = context.getFilesDir();
+        File file = new File(context1.getApplicationInfo().dataDir, sourceFileName);
+        Log.d("Context01", "msg" +context1.getApplicationInfo().dataDir);
         /*if(file.exists())
             Log.d("status", "exists");
         else
@@ -421,7 +442,7 @@ public class MainActivity extends AppCompatActivity
         uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Log.d("Succes", "Uploaded");
+                Log.d("Succes", "Uploaded noti_action");
             }
         });
     }
@@ -472,11 +493,6 @@ public class MainActivity extends AppCompatActivity
             }
             try {
                 bufferedWriter.write(token);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                bufferedWriter.write(",");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -571,7 +587,7 @@ public class MainActivity extends AppCompatActivity
         StorageReference storageRef = storage.getReference();
         final StorageReference firebaseFileRef = storageRef.child( localFileName );
 
-        final File localFile = new File(dir,"user.txt");
+        final File localFile = new File(dir,"users.txt");
         firebaseFileRef.getFile(localFile)
                 .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                     @Override
@@ -588,10 +604,10 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-       File file = new File(dir, localFileName);
+     //  File file = new File(dir, localFileName);
         Log.d("Contextuser", "msg" + dir);
-        boolean check = readFromusertxtFile(localFileName, personemail,dir,context);
-        if (!check) {
+       // boolean check = readFromusertxtFile("users.txt", personemail,dir,context);
+       // if (!check) {
             File file1 = new File(dir, localFileName);
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file1, true));
             bufferedWriter.write(personemail);
@@ -599,10 +615,10 @@ public class MainActivity extends AppCompatActivity
             bufferedWriter.close();
             Log.d("Received", "Writeuser");
             uploadusertxtFile(personemail, localFileName,dir,context);
-        } else {
+       // } else {
             Log.d("already", "membered");
 
-        }
+    //    }
     }
 
     private void uploadusertxtFile(String personemail, String localFileName,File dir, Context context) {
@@ -639,7 +655,7 @@ public class MainActivity extends AppCompatActivity
        // File dir = c.getFilesDir();
         File file = new File(dir, sourceFileNameWExt);
         Log.d("READ",":::"+dir);
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+        BufferedReader bufferedReader=new BufferedReader(new FileReader(file));
         String line = null;
         while ((line = bufferedReader.readLine()) != null) {
             Log.d("status", line);
@@ -665,8 +681,11 @@ public class MainActivity extends AppCompatActivity
         Calendar c = Calendar.getInstance(tz);
         int time = Integer.parseInt(String.format("%02d", c.get(Calendar.HOUR_OF_DAY)));
 
-        int p = Calendar.DATE;
-        Log.d("Received", "default");
+        Date dl=Calendar.getInstance().getTime();
+        SimpleDateFormat format=new SimpleDateFormat("dd");
+        String formatedate=format.format(dl);
+        int p=Integer.parseInt(formatedate);
+        Log.d("Received", "default"+p);
         Log.d("PERSONINFO2","::::"+personemail_txt);
         //localFileName is with the file with extension which needs the content to be written on it.
         try {

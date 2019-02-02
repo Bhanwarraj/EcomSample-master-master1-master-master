@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".Default_Notification"></activity>
-        <activity android:name=".list" />
+        <!--<activity android:name=".list" />-->
         <activity android:name=".Login" /> <!-- <activity -->
         <!-- android:name=".LoginActivity" -->
         <!-- android:label="@string/title_activity_g_login" /> -->
@@ -46,7 +46,7 @@
             android:label="@string/my_wishlist" />
         <activity
             android:name=".options.CartListActivity"
-            android:label="@string/my_cart" />
+            android:label="@string/my_cart"/>
         <activity android:name=".options.SearchResultActivity">
 
             <!-- to identify this activity as "searchable.xml" -->

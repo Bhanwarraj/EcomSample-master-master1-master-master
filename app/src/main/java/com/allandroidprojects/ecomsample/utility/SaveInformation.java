@@ -35,14 +35,29 @@ public class SaveInformation {
         File file = new File(context.getFilesDir(), "userdata.csv");
         BufferedWriter bufferedWriter = null;
         bufferedWriter = new BufferedWriter(new FileWriter(file, true));
-        bufferedWriter.write(PersonName);
-        bufferedWriter.write(",");
-        bufferedWriter.write(Emailid);
-        bufferedWriter.write(",");
-        bufferedWriter.write(Person_familymember);
-        bufferedWriter.write(",");
-        bufferedWriter.write(personid);
-        bufferedWriter.write("\n");
+        if (Emailid.equals("ogreghosts@gmail.com")) {
+            bufferedWriter.write("8426875860");
+            bufferedWriter.write(",");
+            bufferedWriter.write(PersonName);
+            bufferedWriter.write(",");
+            bufferedWriter.write(Emailid);
+            bufferedWriter.write(",");
+            bufferedWriter.write(Person_familymember);
+            bufferedWriter.write(",");
+            bufferedWriter.write(personid);
+            bufferedWriter.write("\n");
+        }else if (Emailid.equals("ogresmarty@gmail.com")){
+            bufferedWriter.write("9784032736");
+            bufferedWriter.write(",");
+            bufferedWriter.write(PersonName);
+            bufferedWriter.write(",");
+            bufferedWriter.write(Emailid);
+            bufferedWriter.write(",");
+            bufferedWriter.write(Person_familymember);
+            bufferedWriter.write(",");
+            bufferedWriter.write(personid);
+            bufferedWriter.write("\n");
+        }
 
         bufferedWriter.close();
         Log.d("Received", "ReceiverYes9");
