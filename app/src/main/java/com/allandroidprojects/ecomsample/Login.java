@@ -285,6 +285,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
         if (acct != null) {
+            Log.d("UpdateUI","DEAD");
             String personName = acct.getDisplayName();
             String personGivenName = acct.getGivenName();
             String personFamilyName = acct.getFamilyName();
@@ -297,17 +298,26 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString(PersonNm, personName);
             editor.putString(Personelmid, personId);
-            MainActivity i=new MainActivity();
-            i.writeTousertxt("users.txt", personEmail,Login.this);
+
             Log.d("writed", "txt");
             SaveInformation saveInformation = new SaveInformation(personName, personEmail, personFamilyName, personId, Login.this);
 
             mDatabase.child(personId).setValue(saveInformation);
+
+            MainActivity dn=new MainActivity();
+            Log.d("ACtIVE",":"+personEmail);
+            dn.personinfo(personEmail);
+
+            //MainActivity i=new MainActivity();
+           // i.writeTousertxt("users.txt", personEmail,context);
+
+            Log.d("csv", "csvmsg90");
+
             ActionReceiver obj = new ActionReceiver();
             obj.getuserinfo(personId, personName, personEmail);
             Log.d("csv", "csvmsg");
-            MainActivity dn=new MainActivity();
-            dn.personinfo(personEmail);
+
+
 
 
         }
@@ -318,12 +328,19 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         String personId = user.getUid();
         String personemail = user.getEmail();
         //writeTousertxt("users.csv",personemail,c);
+
+        MainActivity dn=new MainActivity();
+        Log.d("ACtIVE in Already Login",":"+personemail);
+        dn.personinfo(personemail);
+
         ActionReceiver obj = new ActionReceiver();
         obj.getuserinfo(personId, personname, personemail);
+
         SearchResultActivity obj2 = new SearchResultActivity();
         obj2.getuserinfo_search(personemail);
-        Default_Notification dn=new Default_Notification();
-        dn.personinfo(personemail);
+
+        Default_Notification dq=new Default_Notification();
+        dq.personinfo(personemail);
         Log.d("csv", "csvmsg90");
         return personemail;
     }

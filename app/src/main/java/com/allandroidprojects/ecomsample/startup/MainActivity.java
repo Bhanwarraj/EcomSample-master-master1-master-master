@@ -31,12 +31,14 @@ import com.allandroidprojects.ecomsample.options.CartListActivity;
 import com.allandroidprojects.ecomsample.options.SearchResultActivity;
 import com.allandroidprojects.ecomsample.options.WishlistActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -58,6 +60,9 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 import java.util.TimeZone;
+import java.util.Vector;
+
+import android.content.Context;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -69,9 +74,10 @@ public class MainActivity extends AppCompatActivity
     public StorageReference storageReference;
     public UploadTask uploadTask;
     public Context context;
-   public String personemailfortoken;
-   public  String token;
-    private String personemail;
+    public String personemailfortoken;
+    public String token;
+    public static String personemail_txt;
+    public  Context context2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,9 +85,8 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         FirebaseStorage storage = FirebaseStorage.getInstance();
-
+         File dir=getFilesDir();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -111,22 +116,27 @@ public class MainActivity extends AppCompatActivity
         });*/
         Log.d("enteringlogin", "main1");
 
-        final FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        final FirebaseUser user=mAuth.getCurrentUser();
+       final   FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        final FirebaseUser user = mAuth.getCurrentUser();
         if (user == null) {
-            Log.d("Entered","Logingoing");
+            Log.d("Entered", "Logingoing");
             Intent intent = new Intent(this, Login.class);
             startActivity(intent);
-        } else{
+            try {
+                writeTousertxt("user.txt",personemail_txt,dir,this);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
             Login i = new Login();
             try {
-                personemailfortoken=i.alreadylogin(
-                       MainActivity.this, mAuth.getCurrentUser());
+                personemailfortoken = i.alreadylogin(
+                        MainActivity.this, mAuth.getCurrentUser());
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-       // final FirebaseUser user = mAuth.getCurrentUser();
+        // final FirebaseUser user = mAuth.getCurrentUser();
 
         FirebaseInstanceId.getInstance().getInstanceId()
                 .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
@@ -138,29 +148,32 @@ public class MainActivity extends AppCompatActivity
                         }
 
                         // Get new Instance ID token
-                         token = Objects.requireNonNull(task.getResult()).getToken();
+                        token = Objects.requireNonNull(task.getResult()).getToken();
                         // Log and toast
                         String msg = getString(R.string.msg_token_fmt, token);
                         Log.d("MainActivity", msg);
                         Log.d("", "opened");
                         Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
-                        Log.d("Context","Checking"+getApplicationContext()+""+getBaseContext()+this +""+context);
-                        TimeZone tz=TimeZone.getTimeZone("GMT+5:30");
-                        Calendar c=Calendar.getInstance(tz);
-                        String time=String.format("%02d",c.get(Calendar.HOUR_OF_DAY))+":"+String.format("%02d",c.get(Calendar.MINUTE));
+                        Log.d("Context", "Checking" + getApplicationContext() + "" + getBaseContext() + this + "" + context);
+                        TimeZone tz = TimeZone.getTimeZone("GMT+5:30");
+                        Calendar c = Calendar.getInstance(tz);
+                        String time = String.format("%02d", c.get(Calendar.HOUR_OF_DAY)) + ":" + String.format("%02d", c.get(Calendar.MINUTE));
                         ////////////By mistake app opened code pending///////////
-                       // default_open();
-
+                        // default_open();
 
 
                     }
                 });
 
-      //  Default_Notification obj = new Default_Notification();
+        //  Default_Notification obj = new Default_Notification();
         //obj.activeHour("Yes");
-       // readFiletokenid("token_id.csv",token,personemailfortoken,MainActivity.this);
+        // readFiletokenid("token_id.csv",token,personemailfortoken,MainActivity.this);
         //writeTotoken_id(token,"token_id.csv",personemailfortoken,MainActivity.this);
-        activeHour("Yes");
+        try {
+            activeHour("Yes");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
    /* private void default_open(Context context) {
@@ -331,10 +344,13 @@ public class MainActivity extends AppCompatActivity
     public void writeToAnyFile(String str, String title, String message, String personname, String localFileName, String personemail, String time, Context context) throws IOException {
         Log.d("Received", "ReceiverYes10");
 
+
         //  localFileName is with the file with extension which needs the content to be written on it.
         File file = new File(context.getFilesDir(), localFileName);
+        Log.d("Context00", "msg" + context.getFilesDir());
+
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file, true));
-        if(!file.exists()&& !file.isDirectory()){
+        if (!file.exists() && !file.isDirectory()) {
             bufferedWriter.write("Message");
             bufferedWriter.write(",");
             bufferedWriter.write("Category");
@@ -363,6 +379,7 @@ public class MainActivity extends AppCompatActivity
     public void readFromAnyFile(String sourceFileNameWExt, Context context) {
         File dir = context.getFilesDir();
         File file = new File(dir, sourceFileNameWExt);
+        Log.d("Context", "msg" + dir);
         String readData = "";
         //File f = new File()
         try {
@@ -411,7 +428,7 @@ public class MainActivity extends AppCompatActivity
 
     //////////////////////TOKEN_Id OF EACH USER///////////////////////
 
-    public boolean readFiletokenid(String sourceFileNameWExt,String token,String personemailfortoken ,Context context) {
+    public boolean readFiletokenid(String sourceFileNameWExt, String token, String personemailfortoken, Context context) {
         File dir = context.getFilesDir();
         File file = new File(dir, sourceFileNameWExt);
         String readData = "";
@@ -419,15 +436,15 @@ public class MainActivity extends AppCompatActivity
         try {
             // Handle Csv file properly ASAP!!!.
             BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-            String line = token ;
+            String line = token;
 
-                while (( bufferedReader.readLine())!= null) {
-                    if (bufferedReader.readLine() == line) {
-                        return true;
-                    }
+            while ((bufferedReader.readLine()) != null) {
+                if (bufferedReader.readLine() == line) {
+                    return true;
                 }
-                bufferedReader.close();
-                Log.d("status", readData);
+            }
+            bufferedReader.close();
+            Log.d("status", readData);
 
 
         } catch (IOException e) {
@@ -441,13 +458,12 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    public void writeTotoken_id(String token, String localFileName, String personemail, Context context1)  {
+    public void writeTotoken_id(String token, String localFileName, String personemail, Context context1) {
         Log.d("Received", "ReceiverYes11");
-       // Boolean check=true;
+        // Boolean check=true;
         //  localFileName is with the file with extension which needs the content to be written on it.
         File file = new File(context1.getFilesDir(), localFileName);
-        if (!file.exists())
-        {
+        if (!file.exists()) {
             BufferedWriter bufferedWriter = null;
             try {
                 bufferedWriter = new BufferedWriter(new FileWriter(file, true));
@@ -477,11 +493,10 @@ public class MainActivity extends AppCompatActivity
             Log.d("Received", "ReceiverYes12");
             uploadtoken_file("users", personemail, localFileName, context1);
 
-        } else if(file.exists()){
+        } else if (file.exists()) {
 
-          boolean check=readFiletokenid(localFileName,token,personemail,context1);
-            if(!check)
-            {
+            boolean check = readFiletokenid(localFileName, token, personemail, context1);
+            if (!check) {
                 BufferedWriter bufferedWriter = null;
                 try {
                     bufferedWriter = new BufferedWriter(new FileWriter(file, true));
@@ -509,7 +524,8 @@ public class MainActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
                 Log.d("Received", "ReceiverYes12");
-            uploadtoken_file("users", personemail, localFileName, context);}
+                uploadtoken_file("users", personemail, localFileName, context);
+            }
 
         }
 
@@ -539,39 +555,60 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    /////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////
 
-    void openactivehour()
-    {
-        Intent s=new Intent(MainActivity.this, Default_Notification.class);
+    void openactivehour() {
+        Intent s = new Intent(MainActivity.this, Default_Notification.class);
         startActivity(s);
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////  USERS.txt Single file //////////////////////////////////////////////////////////////////
 
-    public void writeTousertxt(String localFileName, String personemail, Context context) throws IOException {
+    public void writeTousertxt(String localFileName, String personemail,File dir,Context context) throws IOException {
         Log.d("Received", "usertxt");
-        //  localFileName is with the file with extension which needs the content to be written on it.//
-        File file=new File(context. getFilesDir(),localFileName);
-        Log.d("Context", "msg" + context.getFilesDir());
-        boolean check = readFromusertxtFile(localFileName, personemail, context);
+       //  localFileName is with the file with extension which needs the content to be written on it.//
+        FirebaseStorage storage = FirebaseStorage.getInstance("gs://ecommercenotify.appspot.com");
+        StorageReference storageRef = storage.getReference();
+        final StorageReference firebaseFileRef = storageRef.child( localFileName );
+
+        final File localFile = new File(dir,"user.txt");
+        firebaseFileRef.getFile(localFile)
+                .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                        Log.d("SUCCESS ACTIVE",":");
+                    }
+
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle failed download
+                // ...
+                Log.d("status" ,"not downloaded");
+            }
+        });
+
+       File file = new File(dir, localFileName);
+        Log.d("Contextuser", "msg" + dir);
+        boolean check = readFromusertxtFile(localFileName, personemail,dir,context);
         if (!check) {
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file, true));
+            File file1 = new File(dir, localFileName);
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file1, true));
             bufferedWriter.write(personemail);
             bufferedWriter.write("\n");
             bufferedWriter.close();
             Log.d("Received", "Writeuser");
-            uploadusertxtFile(personemail, localFileName, context);
+            uploadusertxtFile(personemail, localFileName,dir,context);
         } else {
             Log.d("already", "membered");
 
         }
     }
 
-    private void uploadusertxtFile(String personemail, String localFileName, Context context) {
+    private void uploadusertxtFile(String personemail, String localFileName,File dir, Context context) {
 
         Log.d("Uploading", "Storagebucket_token");
-        File dir = context.getFilesDir();
+       //File dir =getFilesDir();
         File file = new File(dir, localFileName);
         if (file.exists())
             Log.d("status", "exists");
@@ -583,7 +620,7 @@ public class MainActivity extends AppCompatActivity
 
         StorageReference riv = storageRef.child(localFileName);
         UploadTask uploadTask = riv.putFile(file2);
-        Log.d("Uploading1", "Storagebucket1token");
+        Log.d("Uploading1", "Storagebucketusertxt");
 
         uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -595,59 +632,94 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    public boolean readFromusertxtFile(String sourceFileNameWExt, String email, Context context) {
+    public boolean readFromusertxtFile(String sourceFileNameWExt, String email,File dir,Context c) throws IOException {
 
         Log.d("Reader123", "inside read");
 
-        File dir = context.getFilesDir();
+       // File dir = c.getFilesDir();
         File file = new File(dir, sourceFileNameWExt);
-         BufferedReader bufferedReader=null;
-        try {
-            // Handle Csv file properly ASAP!!!.
-             bufferedReader = new BufferedReader(new FileReader(file));
-            String line = null;
-            while ((line = bufferedReader.readLine()) != null) {
-                Log.d("status", line);
-                if (line.equals(email)) {
-                    Log.d("Reading","Already saved");
-                    return true;
-                }
-                else {
-                    Log.d("Reading","Not found");
-                }
-
-
+        Log.d("READ",":::"+dir);
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+        String line = null;
+        while ((line = bufferedReader.readLine()) != null) {
+            Log.d("status", line);
+            if (line.equals(email)) {
+                Log.d("Reading", "Already saved");
+                return true;
+            } else {
+                Log.d("Reading", "Not found");
             }
-            bufferedReader.close();
-        }catch (IOException e) {
-            e.printStackTrace();
-            Log.d("status", "error!");
-            Log.d("status", file.getPath());
-        }
 
+        }
+        bufferedReader.close();
         return false;
     }
 
-//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////  ACTIVE_HOURS OF EACH USER  //////////////////////////////////////////////////////
 
 
 
-    public void activeHour(String check)
-    {TimeZone tz = TimeZone.getTimeZone("GMT+5:30");
+    public void activeHour(String check) throws IOException { TimeZone tz = TimeZone.getTimeZone("GMT+5:30");
         Calendar c = Calendar.getInstance(tz);
         int time = Integer.parseInt(String.format("%02d", c.get(Calendar.HOUR_OF_DAY)));
 
         int p = Calendar.DATE;
         Log.d("Received", "default");
+        Log.d("PERSONINFO2","::::"+personemail_txt);
         //localFileName is with the file with extension which needs the content to be written on it.
         try {
-            URL website = new URL("https://storage.googleapis.com/ecommercenotify.appspot.com/users/" + personemail + "/" + "active_hours.csv");
+            Log.d("TRY ","entered");
+           /* URL website = new URL("https://storage.googleapis.com/ecommercenotify.appspot.com/users/" + personemail_txt + "/" + "active_hours.csv");
+            Log.d("Downloaded",":file");
             ReadableByteChannel rbc = Channels.newChannel(website.openStream());
             FileOutputStream fos = new FileOutputStream("active_hours.csv");
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-            File inputFile = new File("active_hours.csv");
+            Log.d("READ",":::");*/
+            FirebaseStorage storage = FirebaseStorage.getInstance("gs://ecommercenotify.appspot.com");
+            StorageReference storageRef = storage.getReference();
+            final StorageReference firebaseFileRef = storageRef.child( "users" + "/" + personemail_txt +"/" + "active_hours.csv" );
+
+            final File localFile = new File(getFilesDir(),"active_hours.csv");
+            firebaseFileRef.getFile(localFile)
+                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                            Log.d("SUCCESS ACTIVE",":");
+                        }
+
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle failed download
+                    // ...
+                    Log.d("status" ,"not downloaded");
+                }
+            });
+            Log.d("Downloaded",":file");
+           // File inputFile = new File("active_hours.csv");
             // Read existing file
-            CSVReader reader = new CSVReader(new FileReader(inputFile),',');
+            Vector<String> data;
+            if(check.equals("No"))
+            {
+                data =changeCharAt(time,p,1);
+                File file= new File(getFilesDir(),"active_hours.csv");
+                file.delete();
+                writeToactiveFile(data,"active_hours.csv");
+
+            }else if (check.equals("Yes"))
+            {    Log.d("YES","YES");
+                data =changeCharAt(time,p,3);
+                Log.d("DATA",":"+data);
+                File file= new File(getFilesDir(),"active_hours.csv");
+                file.delete();
+                writeToactiveFile(data,"active_hours.csv");
+            }
+
+
+
+           /* CSVReader reader = new CSVReader(new FileReader(inputFile),',');
             List<String[]> csvBody = reader.readAll();
             // get CSV row column  and replace with by using row and column
             String []line;
@@ -672,35 +744,47 @@ public class MainActivity extends AppCompatActivity
             CSVWriter writer = new CSVWriter(new FileWriter(inputFile), ',');
             writer.writeAll(csvBody);
             writer.flush();
-            writer.close();
+            writer.close();*/
         } catch (Exception e) {
-            Log.d("Catch","Catchenter");
-            File dir = getFilesDir();
-            File file = new File(dir,"active_hours.csv");
-            FileWriter output = null;
-            try {
+            Log.d("Catch","Catchenter"+check);
+           // File dir = getFilesDir();
+            //File file = new File(dir,"active_hours.csv");
+            //FileWriter output = null;
+            /*try {
                 output = new FileWriter(file);
             } catch (IOException e1) {
                 e1.printStackTrace();
-            }
+            }*/
             Log.d("Catch","Catchenter1");
-
-            CSVWriter writer1 = new CSVWriter(output);
+            String data = "00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,"+p;
+            String header = "00:00-01:00,01:00-02:00, 02:00-03:00, 03:00-04:00, 04:00-05:00, 05:00-06:00, 06:00-07:00, 07:00-08:00, 08:00-09:00, 09:00-10:00, 10:00-11:00, 11:00-12:00, 12:00-13:00, 13:00-14:00, 14:00-15:00, 15:00-16:00, 16:00-17:00, 17:00-18:00, 18:00-19:00, 19:00-20:00, 20:00-21:00, 21:00-22:00, 22:00-23:00, 23:00-00:00, date\n";
+            Log.d("Catch","Catchenter22");
+            Vector<String> intial_data= new Vector<String>(2);
+            Log.d("Catch","Catchenter33");
+            intial_data.add(header);
+            Log.d("Catch","Catchenter44");
+            intial_data.add(data);
+            Log.d("Catch","Catchenter55");
+            writeheader(header.toString(),data.toString(),"active_hours.csv");
+          /*  CSVWriter writer1 = new CSVWriter(output);
             String[] header = {"00:00-01:00", "01:00-02:00", "02:00-03:00", "03:00-04:00", "04:00-05:00", "05:00-06:00", "06:00-07:00", "07:00-08:00", "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", "14:00-15:00", "15:00-16:00", "16:00-17:00", "17:00-18:00", "18:00-19:00", "19:00-20:00", "20:00-21:00", "21:00-22:00", "22:00-23:00", "23:00-00:00", "date"};
             writer1.writeNext(header);
+            Log.d("CSv","header"+header);
             String[] data = {"0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", Integer.toString(p)};
             if (check.equals("No")) {
                 data[time] = Integer.toString(Integer.parseInt(data[time]) + 1);
+                Log.d("CSV","Data"+data[time]);
                 writer1.writeNext(data);
-                upload_file("users", personemail, "active_hours.csv", this);
+                upload_file("users", personemail_txt, "active_hours.csv");
             } else if (check.equals("Yes")) {
+                Log.d("check",": "+check);
                 data[time] = Integer.toString(Integer.parseInt(data[time]) + 3);
                 writer1.writeNext(data);
-                Log.d("Catch","Catchenter2");
-                upload_file("users", personemail, "active_hours.csv", this);
+                Log.d("Catch","CatchenterYes");
+                upload_file("users", personemail_txt, "active_hours.csv");
 
 
-            }
+            }*/
         }
 
 
@@ -713,19 +797,22 @@ public class MainActivity extends AppCompatActivity
 
    public  void personinfo(String email)
     {
-        personemail=email;
+        personemail_txt=email;
+        Log.d("PERSONINFO","::"+personemail_txt);
+
     }
 
 
-    public void upload_file(String firebaseFolder, String personemail, String sourceFileName, Context context1) {
+    public void upload_file(String firebaseFolder, String personemail, String sourceFileName) {
         Log.d("Uploading", "Storagebucket_activehours");
-        File dir = context1.getFilesDir();
+        File dir = getFilesDir();
         File file = new File(dir, sourceFileName);
 
         Uri file2 = Uri.fromFile(file);
         FirebaseStorage storage = FirebaseStorage.getInstance("gs://ecommercenotify.appspot.com");
         StorageReference storageRef = storage.getReference();
 
+        Log.d("Email::",""+personemail);
         StorageReference riv = storageRef.child(firebaseFolder + "/" + personemail + "/" + sourceFileName);
         UploadTask uploadTask = riv.putFile(file2);
         Log.d("Uploading1", "Storagebuckket upload");
@@ -738,7 +825,114 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+    private  Vector<String> readFromactiveFile(String sourceFileNameWExt){
+        File dir = getFilesDir();
+      //  String dir = "D:\\";
+        File file = new File(dir, sourceFileNameWExt);
+        String readData = "";
+        Vector<String> data = new Vector<String>(0);
+        //File f = new File()
+        try {
+            // Handle Csv file properly ASAP!!!.
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+            String line = null;
+            while((line = bufferedReader.readLine() ) != null ){
+//                Log.d("status", line);
+                readData += line;
+                Log.d("CHECKING",":"+readData);
+                data.add(line);
+                Log.d("CHECKING",":"+readData);
+                //System.out.println(line);
+            }
+            bufferedReader.close();
 
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+        return data;
+    }
+
+    private  Vector<String> changeCharAt(int time_ ,int k ,int a){
+        //read a line from active_hours.csv
+        //change a value in this line
+        //write back to the file
+        Log.d("VECTOR","::");
+        Vector<String> data = readFromactiveFile("active_hours.csv");
+        Log.d("VECTOR22","::"+data);
+        //System.out.println(data);
+        // k = 2;  // date*2
+         //time_ = 4;
+
+        Boolean True_ = true;
+        try{  Log.d("VECTOR33","::");
+            Boolean kuch = data.get(0).isEmpty();}
+        catch(Exception e){
+            True_ = false;
+
+        }
+        for(int i = 1;True_;){
+            if(i==k){
+                // we found the row
+                // now time will tel at which index we have to edit in i
+                StringBuilder row  = new StringBuilder(data.get(i));
+               // System.out.println(row.charAt(time_));
+                int value = Integer.parseInt(""+row.charAt(time_));
+                try{
+                    row.setCharAt(time_,(Integer.toString( value+ a).charAt(0)));
+                    Log.d("ROW","::"+a);
+                   // System.out.println("44444444444"+row.charAt(time_));
+                }
+                catch(Exception e){
+                    row.setCharAt(time_,Integer.toString((value + a)% 10).charAt(0));
+                    row.setCharAt(time_,Integer.toString((value + a)/ 10).charAt(0));
+                }
+
+                data.set(i, row.toString());
+
+            }
+          //  System.out.println(data.get(i));
+            i++;
+            try{Boolean kuch = data.get(i).isEmpty();}
+            catch(Exception e){
+                True_ = false;
+            }
+        }
+       // StringBuilder myName = new StringBuilder("domanokz");
+       // myName.setCharAt(4, 'x');
+
+       // System.out.println(myName);
+        return data;
+    }
+
+    private  void writeToactiveFile(Vector<String> data, String localFileName) throws IOException {
+         Log.d("Entered","WRITING TO EDIT");
+        //  localFileName is with the file with extension which needs the content to be written on it.
+        File dir = getFilesDir();
+        File file = new File(dir, localFileName);
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
+        for(int i =0;i < 8; i++) {
+
+            bufferedWriter.append(data.get(i)+"\n");
+        }
+
+        bufferedWriter.close();
+        readFromactiveFile(localFileName);
+
+        upload_file("users",personemail_txt,localFileName);
+
+    }
+
+    public void writeheader(String header,String first_row,String localFileName) throws IOException {
+        Log.d("WRITEINITIAL","ACTIVE");
+        File dir = getFilesDir();
+        File file = new File(dir, localFileName);
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
+        bufferedWriter.write(header);
+        bufferedWriter.write(first_row);
+        bufferedWriter.close();
+
+        upload_file("users",personemail_txt,localFileName);
+    }
 
 
 }

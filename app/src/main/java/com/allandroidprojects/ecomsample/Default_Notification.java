@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.allandroidprojects.ecomsample.startup.MainActivity;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -34,10 +35,15 @@ public class Default_Notification extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_default__notification);
-        activeHour("No");
-
+       // activeHour("No");
+        MainActivity k=new MainActivity();
+        try {
+            k.activeHour("No");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    public void activeHour(String check)
+  /*  public void activeHour(String check)
     {TimeZone tz = TimeZone.getTimeZone("GMT+5:30");
         Calendar c = Calendar.getInstance(tz);
         int time = Integer.parseInt(String.format("%02d", c.get(Calendar.HOUR_OF_DAY)));
@@ -111,14 +117,14 @@ public class Default_Notification extends AppCompatActivity {
 
         }
 
-
+*/
     public  void personinfo(String email)
     {
         personemail=email;
     }
 
 
-    public void upload_file(String firebaseFolder, String personemail, String sourceFileName, Context context1) {
+  /*  public void upload_file(String firebaseFolder, String personemail, String sourceFileName, Context context1) {
         Log.d("Uploading", "Storagebucket_activehours");
         File dir = getFilesDir();
         File file = new File(dir, sourceFileName);
@@ -139,7 +145,7 @@ public class Default_Notification extends AppCompatActivity {
         });
     }
 
-
+*/
 }
 
 
