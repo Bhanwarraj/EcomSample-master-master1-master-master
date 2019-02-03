@@ -5,6 +5,7 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.renderscript.Sampler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
@@ -53,6 +54,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -66,6 +68,8 @@ import java.util.TimeZone;
 import java.util.Vector;
 
 import android.content.Context;
+
+import static org.apache.commons.lang3.ArrayUtils.toArray;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -701,6 +705,7 @@ public class MainActivity extends AppCompatActivity
             final StorageReference firebaseFileRef = storageRef.child( "users" + "/" + personemail_txt +"/" + "active_hours.csv" );
 
             final File localFile = new File(getFilesDir(),"active_hours.csv");
+            Log.d("Dir",".."+getFilesDir());
             firebaseFileRef.getFile(localFile)
                     .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                         @Override
@@ -775,8 +780,8 @@ public class MainActivity extends AppCompatActivity
                 e1.printStackTrace();
             }*/
             Log.d("Catch","Catchenter1");
-            String data = "00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,"+p;
-            String header = "00:00-01:00,01:00-02:00, 02:00-03:00, 03:00-04:00, 04:00-05:00, 05:00-06:00, 06:00-07:00, 07:00-08:00, 08:00-09:00, 09:00-10:00, 10:00-11:00, 11:00-12:00, 12:00-13:00, 13:00-14:00, 14:00-15:00, 15:00-16:00, 16:00-17:00, 17:00-18:00, 18:00-19:00, 19:00-20:00, 20:00-21:00, 21:00-22:00, 22:00-23:00, 23:00-00:00, date\n";
+            String data = "00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,0"+p;
+            String header = "00:00-01:00,01:00-02:00,02:00-03:00,03:00-04:00,04:00-05:00,05:00-06:00,06:00-07:00,07:00-08:00,08:00-09:00,09:00-10:00,10:00-11:00,11:00-12:00,12:00-13:00,13:00-14:00,14:00-15:00,15:00-16:00,16:00-17:00,17:00-18:00,18:00-19:00,19:00-20:00,20:00-21:00,21:00-22:00,22:00-23:00,23:00-00:00,date\n";
             Log.d("Catch","Catchenter22");
             Vector<String> intial_data= new Vector<String>(2);
             Log.d("Catch","Catchenter33");
@@ -847,25 +852,39 @@ public class MainActivity extends AppCompatActivity
     private  Vector<String> readFromactiveFile(String sourceFileNameWExt){
         File dir = getFilesDir();
       //  String dir = "D:\\";
-        File file = new File(dir, sourceFileNameWExt);
+        File file = new File( sourceFileNameWExt);
+        Log.d("File",""+dir+sourceFileNameWExt);
         String readData = "";
         Vector<String> data = new Vector<String>(0);
         //File f = new File()
         try {
             // Handle Csv file properly ASAP!!!.
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+            BufferedReader bufferedReader = new BufferedReader(new FileReader("/data/user/0/com.allandroidprojects.ecomsample/files/active_hours.csv") {
+                @Override
+                public int read(@NonNull char[] cbuf, int off, int len) throws IOException {
+                    return 0;
+                }
+
+                @Override
+                public void close() throws IOException {
+
+                }
+            });
+            Log.d("File123","11");
             String line = null;
             while((line = bufferedReader.readLine() ) != null ){
 //                Log.d("status", line);
-                readData += line;
-                Log.d("CHECKING",":"+readData);
-                data.add(line);
-                Log.d("CHECKING",":"+readData);
+                //readData += line;
+                Log.d("CHECKING11",":"+line);
+                data.addElement(line);
+                Log.d("CHECKING",":");
                 //System.out.println(line);
+
             }
             bufferedReader.close();
 
         } catch (IOException e){
+            Log.d("CHECKING12",":");
             e.printStackTrace();
         }
         return data;
@@ -877,7 +896,8 @@ public class MainActivity extends AppCompatActivity
         //write back to the file
         Log.d("VECTOR","::");
         Vector<String> data = readFromactiveFile("active_hours.csv");
-        Log.d("VECTOR22","::"+data);
+      // .toArray(data);
+       Log.d("VECTOR22",":: "+ data.toString());
         //System.out.println(data);
         // k = 2;  // date*2
          //time_ = 4;
@@ -889,7 +909,102 @@ public class MainActivity extends AppCompatActivity
             True_ = false;
 
         }
-        for(int i = 1;True_;){
+        int no_of_rows=0;
+        int x=0;
+        try{
+            for(x=0;x<8;x++)
+            {
+                data.get(x);
+            }
+            no_of_rows=x;
+        }catch (Exception e){
+            no_of_rows=x;
+        }
+        if (no_of_rows==8){
+            Log.d("Row","8");
+            for (int i=1;i<9;i++)
+                {if (i==8)
+                    {
+                        data.remove(1);
+                        StringBuilder new_row  = new StringBuilder("00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,"+k);
+                        time_*=3;
+                        int value_to_set=Integer.parseInt(new_row.substring(time_,time_+2)) +a;
+                        if (value_to_set<10){
+                            new_row.setCharAt(time_,'0');
+                        }
+                        else
+                        {
+                            new_row.setCharAt(time_,(Integer.toString(value_to_set).charAt(0)));
+                        }
+                       // new_row.setCharAt(time_+1,(Integer.toString(value_to_set).charAt(1)));
+                        break;
+
+                    }
+
+                    if(Integer.parseInt(data.get(i).substring(73,75))==k)
+                    {  StringBuilder row  = new StringBuilder(data.get(i));
+                       time_*=3;
+
+                       int value_to_set=Integer.parseInt(row.substring(time_,time_+2))+a;
+                       if (value_to_set<10){
+                           row.setCharAt(time_,'0');
+                       }
+                       else
+                       {
+                           row.setCharAt(time_,(Integer.toString(value_to_set).charAt(0)));
+                       }
+                      // row.setCharAt(time_+1,(Integer.toString(value_to_set).charAt(1)));
+                       break;
+                    }
+
+                }
+
+
+        }
+        else{
+            try { Log.d("Row","else");
+                for (int i=1;i<8;i++){
+                    Log.d("Row","forcheck"+Integer.parseInt(data.get(i).substring(73,74)));
+                    if(Integer.parseInt(data.get(i).substring(73,75))==k)
+                    {  Log.d("Row","Enterif"+i);
+                        StringBuilder row  = new StringBuilder(data.get(i));
+                        time_*=3;
+
+                        int value_to_set=Integer.parseInt(row.substring(time_,time_+2))+a;
+                        if (value_to_set<10){
+                            Log.d("Row","nextif");
+                            row.setCharAt(time_,'0');
+                        }
+                        else
+                        {  Log.d("Row","nextelse");
+                            row.setCharAt(time_,(Integer.toString(value_to_set).charAt(0)));
+                        }
+                       // row.setCharAt(time_+1,(Integer.toString(value_to_set).charAt(1)));
+                        break;
+                    }
+
+                }
+            }catch (Exception e){
+
+                Log.d("Catch","active");
+                StringBuilder new_row  = new StringBuilder("00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,"+k);
+                time_*=3;
+                int value_to_set=Integer.parseInt(new_row.substring(time_,time_+2)) +a;
+                if (value_to_set<10){
+                    new_row.setCharAt(time_,'0');
+                }
+                else
+                {
+                    new_row.setCharAt(time_,(Integer.toString(value_to_set).charAt(0)));
+                }
+              //  new_row.setCharAt(time_+1,(Integer.toString(value_to_set).charAt(1)));
+
+            }
+
+        }
+
+
+       /* for(int i = 1;True_;){
             if(i==k){
                 // we found the row
                 // now time will tel at which index we have to edit in i
@@ -919,7 +1034,8 @@ public class MainActivity extends AppCompatActivity
        // StringBuilder myName = new StringBuilder("domanokz");
        // myName.setCharAt(4, 'x');
 
-       // System.out.println(myName);
+       // System.out.println(myName);*/
+       Log.d("Data","return");
         return data;
     }
 
@@ -927,7 +1043,7 @@ public class MainActivity extends AppCompatActivity
          Log.d("Entered","WRITING TO EDIT");
         //  localFileName is with the file with extension which needs the content to be written on it.
         File dir = getFilesDir();
-        File file = new File(dir, localFileName);
+        File file = new File( dir,localFileName);
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
         for(int i =0;i < 8; i++) {
 
