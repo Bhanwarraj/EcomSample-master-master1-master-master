@@ -1,6 +1,5 @@
-##EcomSample - Sample e-commerce Online Shopping App like flipkart, snapdeal, amazon
 
-This application is a sample of Online Shopping where a person can select desired items to buy and add to the cart.This application is made to reduce Push Notifications.
+This application is made to reduce Push Notifications.
 
 Technologies Used:
 1.Android Studio
@@ -15,15 +14,14 @@ Technologies Used:
 5. All other options available in side Navigation Drawer.
 6. Introslider at starting of application.
 6. Material design based app.
+7. Uploading of files such as Seaeched items,time when user open his app.
 
 
 Note: Please consider the below points
 
 1.The images are downloading from this site: https://www.pexels.com, But you can provide your own server urls to load the image.
 
-2.Item description I have just hard coded only for showcase. 
-
-Please feel free to comment for any clarification or suggestion.
+2.Item description I have just hard coded only for showcasing.
 
 ###Screen shots: 
 
